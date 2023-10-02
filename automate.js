@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer');
+const PCR = require("puppeteer-chromium-resolver");
 const fs=require('fs/promises');
 const { setEngine } = require('crypto');
 const path = require('path');
@@ -16,11 +17,18 @@ async function Continue(page) {
 
 async function login(row,index,i){
     try{
-    const browser = await puppeteer.launch({
+      const stats = await PCR();
+      const puppeteerOptions = {
+        // headless: false,
+        executablePath: stats.executablePath,
         args: [
           '--window-size=1920,1080',
         ],
-      });
+      };
+    const browser = await puppeteer.launch(puppeteerOptions);
+    // const browser = await puppeteer.launch({
+        
+    //   });
     const page = await browser.newPage()
     await page.goto("https://quality-aviation.traacs.co/nucorelib/basic_users/login")
     
@@ -52,7 +60,6 @@ async function login(row,index,i){
     var input = await page.$('#txtReceiptDate');
     await input.click({ clickCount: 3 })
     await page.type("#txtReceiptDate",date)
-    
     await page.$eval('#cmbReceiptCostCenter', (selectElement, text) => {
         var options = selectElement.querySelectorAll('option');
         for (var option of options) {
@@ -96,7 +103,7 @@ async function login(row,index,i){
     values=[]
     const select = '#tblReceiptParty > tbody > tr.odd > td:nth-child(2)';
     var textContent = await page.$eval(select, (element) => {
-      console.log("Here",element.textContent)
+      // console.log("Here",element.textContent)
       return element.textContent;
     });
     var y=textContent
