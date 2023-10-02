@@ -5,19 +5,17 @@ on:
     - cron: '0 18 * * *'  # Run daily at midnight
 
 jobs:
-  run-script:
+  cron_job:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 60
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - name: Running script
+        uses: appleboy/ssh-action@master
         with:
-          node-version: '18'  
-      - name: Install dependencies
-        run: npm install  # Or yarn install if you use Yarn
+          host: ${{ secrets.SERVER_IP_TRACKS }}
+          key: ${{ secrets.SSH_KEY_TRACKS }}
+          username: ${{ secrets.SERVER_USERNAME_TRACKS }}
+          script: cd ${{ secrets.PROJECT_PATH_TRACKS }} && git pull origin master && npm install && node index.js
 
-      - name: Run daily script
-        run: node index.js
+
